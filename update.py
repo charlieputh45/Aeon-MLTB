@@ -25,7 +25,6 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from pytz import timezone
 from requests import get as rget
-from dotenv import load_dotenv
 
 getLogger("pymongo").setLevel(ERROR)
 
