@@ -17,13 +17,15 @@ from logging import (
 from logging import (
     info as log_info,
 )
-from os import path, remove
+from os import path, remove, environ
 from subprocess import run as srun
 from sys import exit
 
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from pytz import timezone
+from requests import get as rget
+from dotenv import load_dotenv
 
 getLogger("pymongo").setLevel(ERROR)
 
@@ -63,6 +65,22 @@ stream_handler = StreamHandler()
 stream_handler.setFormatter(formatter)
 
 basicConfig(handlers=[file_handler, stream_handler], level=INFO)
+
+CONFIG_FILE_URL = environ.get('CONFIG_FILE_URL')
+try:
+    if len(CONFIG_FILE_URL) == 0:
+        raise TypeError
+    try:
+        res = rget(CONFIG_FILE_URL)
+        if res.status_code == 200:
+            with open('config.py', 'wb+') as f:
+                f.write(res.content)
+        else:
+            log_error(f"Failed to download config.env {res.status_code}")
+    except Exception as e:
+        log_error(f"CONFIG_FILE_URL: {e}")
+except:
+    pass
 
 # Attempt to load from config.py
 try:
